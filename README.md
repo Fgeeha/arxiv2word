@@ -4,7 +4,7 @@
 
 The project is designed to easily receive word files of articles from arxiv.org
 
-Uses Python (icecream + aiofiles + aiohttp + beautifulsoup4 + requests) + Poetry + makefile + Docker + Pandoc
+Uses [Python](https://www.python.org/) (icecream + aiofiles + aiohttp + beautifulsoup4 + requests) + [Poetry](https://python-poetry.org/docs/) + [makefile](https://www.gnu.org/software/make/) + [Docker](https://www.docker.com/) + [Pandoc](https://pandoc.org/installing.html)
 
 ## Using (docker)
 
