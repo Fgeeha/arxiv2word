@@ -18,6 +18,7 @@ from requests.exceptions import (
 # Directory for saving output files
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"}
 
 
 # Function for extracting the article ID from the link
@@ -27,6 +28,29 @@ def extract_arxiv_id(url):
     if match:
         return match.group(1)
     return None
+
+
+async def clean_images_from_folder(folder_path=OUTPUT_DIR):
+    try:
+        files = os.listdir(folder_path)
+    except FileNotFoundError:
+        ic(f"Folder not found: {folder_path}")
+        return
+
+    for file in files:
+        file_path = os.path.join(folder_path, file)
+
+        if os.path.isfile(file_path) and any(
+            file.lower().endswith(ext) for ext in IMAGE_EXTENSIONS
+        ):
+            try:
+                os.remove(file_path)
+                ic(f"The file was deleted: {file}")
+            except Exception as e:
+                ic(f"Error deleting a file {file}: {e}")
+
+        elif os.path.isdir(file_path):
+            await clean_images_from_folder(file_path)
 
 
 # Asynchronous function for downloading images
@@ -139,6 +163,8 @@ async def main():
         if html_filename:
             # Converting HTML to Word
             convert_html_to_word(html_filename)
+            # Clearing the folder
+            await clean_images_from_folder(OUTPUT_DIR)
 
 
 # Launching the program
