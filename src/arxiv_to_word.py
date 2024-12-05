@@ -165,6 +165,8 @@ async def main():
             convert_html_to_word(html_filename)
             # Clearing the folder
             await clean_images_from_folder(OUTPUT_DIR)
+    else:
+        ic(f"Couldn't identify the id - {url}")
 
 
 # Launching the program
