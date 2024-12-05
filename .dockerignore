@@ -4,5 +4,5 @@
 .github
 makefile
 .pre-commit-config.yaml
-README.md
+*.md
 .flake8
