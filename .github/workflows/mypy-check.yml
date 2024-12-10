@@ -14,20 +14,27 @@ jobs:
             .github
             src
             poetry.lock
-      - name: Install poetry
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
-
-      - name: Install dependencies
-        run: |
-          poetry install
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "poetry"
+          cache: "poetry" # Кэширование Poetry-зависимостей
+
+      - name: Install poetry
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+          export PATH="$PATH:$(python3 -m site --user-base)/bin"
+          poetry --version
+
+      - name: Use correct Python version for Poetry
+        run: |
+          export PATH="$PATH:$(python3 -m site --user-base)/bin"
+          poetry env use python3.12
+          poetry install
 
       - name: Run mypy
-        run: poetry run mypy .
+        run: |
+          export PATH="$PATH:$(python3 -m site --user-base)/bin"
+          poetry run mypy .
