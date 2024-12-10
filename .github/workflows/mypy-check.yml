@@ -10,20 +10,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+            sparse-checkout: |
+              .github
+              src
+              
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
+
       - name: Install poetry
         shell: pwsh
         run: |
-          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-          Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-          scoop install pipx
-          pipx ensurepath
+          sudo apt update
+          sudo apt install pipx
+          pipx ensurepath --global
           pipx install poetry
           poetry completions bash >> ~/.bash_completion
           poetry lock --no-update  
+          
       - name: Install dependencies
         run: poetry install
       - name: Run mypy
