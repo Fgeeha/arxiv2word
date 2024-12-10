@@ -6,31 +6,27 @@ jobs:
   mypy:
     runs-on: ubuntu-latest
 
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-            sparse-checkout: |
-              .github
-              src
-              
+          sparse-checkout: |
+            .github
+            src
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
       - name: Install poetry
-        shell: pwsh
         run: |
-          sudo apt update
-          sudo apt install pipx
-          pipx ensurepath --global
-          pipx install poetry
-          poetry completions bash >> ~/.bash_completion
-          poetry lock --no-update  
-          
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+
       - name: Install dependencies
-        run: poetry install
+        run: |
+          poetry install
+
       - name: Run mypy
         run: poetry run mypy .
