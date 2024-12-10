@@ -14,13 +14,6 @@ jobs:
             .github
             src
             poetry.lock
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "poetry"
-
       - name: Install poetry
         run: |
           python3 -m pip install --upgrade pip
@@ -30,6 +23,12 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "poetry"
 
       - name: Run mypy
         run: poetry run mypy .
