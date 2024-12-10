@@ -30,13 +30,17 @@ jobs:
       # Install Poetry
       - name: Install Poetry
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "Poetry installed"
+          run: |
+          sudo apt update
+          sudo apt install pipx
+          pipx ensurepath --global
+          pipx install poetry
+          poetry completions bash >> ~/.bash_completion
+          poetry lock --no-update
 
       # Install dependencies using Poetry
       - name: Install dependencies
-        run: |
-          ~/.local/bin/poetry install --no-interaction --no-ansi
+        run: poetry install
 
       # Cache virtual environment
       - name: Cache virtual environment
@@ -49,5 +53,4 @@ jobs:
 
       # Run type checking with mypy
       - name: Run mypy
-        run: |
-          ~/.local/bin/poetry run mypy .
+        run: poetry run mypy .
