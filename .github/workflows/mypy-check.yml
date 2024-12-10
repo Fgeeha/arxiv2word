@@ -1,0 +1,18 @@
+name: Check Types with mypy
+
+on: [push, pull_request]
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          export PATH="$HOME/.poetry/bin:$PATH"
+      - name: Install dependencies
+        run: poetry install
+      - name: Run mypy
+        run: poetry run mypy .

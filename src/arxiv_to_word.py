@@ -2,6 +2,7 @@ import asyncio
 import os
 import re
 import subprocess
+from typing import Optional
 from urllib.parse import urljoin
 
 import aiohttp
@@ -22,7 +23,7 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"}
 
 
 # Function for extracting the article ID from the link
-def extract_arxiv_id(url):
+def extract_arxiv_id(url: str) -> Optional[str]:
     pattern = r"(?:arxiv\.org(?:/pdf|/abs)/|ar5iv\.labs\.arxiv\.org/html/)(\d+\.\d+)"
     match = re.search(pattern, url)
     if match:
@@ -30,7 +31,7 @@ def extract_arxiv_id(url):
     return None
 
 
-async def clean_images_from_folder(folder_path=OUTPUT_DIR):
+async def clean_images_from_folder(folder_path: str = OUTPUT_DIR) -> None:
     try:
         files = os.listdir(folder_path)
     except FileNotFoundError:
@@ -54,7 +55,11 @@ async def clean_images_from_folder(folder_path=OUTPUT_DIR):
 
 
 # Asynchronous function for downloading images
-async def download_image(session, url, output_dir):
+async def download_image(
+    session: aiohttp.ClientSession,
+    url: str,
+    output_dir: str,
+) -> None:
     try:
         if url.startswith("data:image"):
             ic(f"Skipping the image (base64): {url}")
@@ -72,10 +77,10 @@ async def download_image(session, url, output_dir):
 
 # Asynchronous function for downloading all images from an HTML page
 async def download_images(
-    html_content,
-    output_dir,
-    base_url="https://ar5iv.labs.arxiv.org",
-):
+    html_content: str,
+    output_dir: str,
+    base_url: str = "https://ar5iv.labs.arxiv.org",
+) -> None:
     soup = BeautifulSoup(html_content, "html.parser")
     image_urls = [
         urljoin(base_url, img["src"]) for img in soup.find_all("img", src=True)
@@ -87,7 +92,7 @@ async def download_images(
 
 
 # A function for correcting paths to images in HTML
-def fix_image_paths_in_html(html_content, output_dir):
+def fix_image_paths_in_html(html_content: str, output_dir: str) -> str:
     soup = BeautifulSoup(html_content, "html.parser")
 
     # Replacing all relative paths with local paths
@@ -103,7 +108,7 @@ def fix_image_paths_in_html(html_content, output_dir):
 
 
 # Function for converting HTML to Word
-def convert_html_to_word(html_filename):
+def convert_html_to_word(html_filename: str) -> None:
     output_filename = html_filename.replace(".html", ".docx")
     command = ["pandoc", html_filename, "-o", output_filename]
     try:
@@ -116,7 +121,7 @@ def convert_html_to_word(html_filename):
 
 
 # Function for downloading HTML pages and processing
-async def download_arxiv_html(arxiv_id):
+async def download_arxiv_html(arxiv_id: str) -> Optional[str]:
     url = f"https://ar5iv.labs.arxiv.org/html/{arxiv_id}"
 
     try:
@@ -149,7 +154,7 @@ async def download_arxiv_html(arxiv_id):
 
 
 # Главная функция программы
-async def main():
+async def main() -> None:
     url = input(
         "Enter the link to the article (for example, https://arxiv.org/abs/2403.01915 ): ",
     ).strip()
