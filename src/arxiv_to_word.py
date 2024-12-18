@@ -24,9 +24,14 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"}
 
 # Function for extracting the article ID from the link
 def extract_arxiv_id(url: str) -> Optional[str]:
-    pattern = r"(?:arxiv\.org(?:/pdf|/abs)/|ar5iv\.labs\.arxiv\.org/html/)(\d+\.\d+)"
-    match = re.search(pattern, url)
-    if match:
+    # Match arXiv link patterns
+    link_pattern = r"(?:arxiv\.org(?:/pdf|/abs)/|ar5iv\.labs\.arxiv\.org/html/)(\d+\.\d+)"
+    # Match direct arXiv ID patterns
+    id_pattern = r"^(\d+\.\d+)$"
+
+    if match := re.search(link_pattern, url):
+        return match.group(1)
+    elif match := re.search(id_pattern, url):
         return match.group(1)
     return None
 
@@ -156,7 +161,7 @@ async def download_arxiv_html(arxiv_id: str) -> Optional[str]:
 # Главная функция программы
 async def main() -> None:
     url = input(
-        "Enter the link to the article (for example, https://arxiv.org/abs/2403.01915 ): ",
+        "Enter the link to the article (for example, https://arxiv.org/abs/2403.01915 or 2403.01915): ",
     ).strip()
 
     # Extracting the arxiv ID from the URL
