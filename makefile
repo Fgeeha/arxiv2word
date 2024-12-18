@@ -22,6 +22,8 @@ build:
 run:
 	${D} run -it --rm -v $(VOLUME_PATH):/app/output ${APP_CONTAINER}
 
-
+build-and-run:
+	make build
+	make run
 
 
