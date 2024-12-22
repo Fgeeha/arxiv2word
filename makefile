@@ -14,7 +14,7 @@ else
 endif
 
 
-.PHONY: build run
+.PHONY: build run build-and-run pre-commit
 
 build:
 	${D} build -t ${APP_CONTAINER} .
@@ -26,4 +26,5 @@ build-and-run:
 	make build
 	make run
 
-
+pre-commit:
+	poetry run pre-commit run --all-files
