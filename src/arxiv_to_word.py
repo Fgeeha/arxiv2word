@@ -17,15 +17,17 @@ from requests.exceptions import (
 
 
 # Directory for saving output files
-OUTPUT_DIR = "output"
+OUTPUT_DIR: str = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"}
+IMAGE_EXTENSIONS: set[str] = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"}
 
 
 # Function for extracting the article ID from the link
 def extract_arxiv_id(url: str) -> Optional[str]:
     # Match arXiv link patterns
-    link_pattern = r"(?:arxiv\.org(?:/pdf|/abs)/|ar5iv\.labs\.arxiv\.org/html/)(\d+\.\d+)"
+    link_pattern = (
+        r"(?:arxiv\.org(?:/pdf|/abs)/|ar5iv\.labs\.arxiv\.org/html/)(\d+\.\d+)"
+    )
     # Match direct arXiv ID patterns
     id_pattern = r"^(\d+\.\d+)$"
 
@@ -86,7 +88,7 @@ async def download_images(
     output_dir: str,
     base_url: str = "https://ar5iv.labs.arxiv.org",
 ) -> None:
-    soup = BeautifulSoup(html_content, "html.parser")
+    soup: BeautifulSoup = BeautifulSoup(html_content, "html.parser")
     image_urls = [
         urljoin(base_url, img["src"]) for img in soup.find_all("img", src=True)
     ]
@@ -98,7 +100,7 @@ async def download_images(
 
 # A function for correcting paths to images in HTML
 def fix_image_paths_in_html(html_content: str, output_dir: str) -> str:
-    soup = BeautifulSoup(html_content, "html.parser")
+    soup: BeautifulSoup = BeautifulSoup(html_content, "html.parser")
 
     # Replacing all relative paths with local paths
     for img in soup.find_all("img", src=True):
@@ -128,7 +130,6 @@ def convert_html_to_word(html_filename: str) -> None:
 # Function for downloading HTML pages and processing
 async def download_arxiv_html(arxiv_id: str) -> Optional[str]:
     url = f"https://ar5iv.labs.arxiv.org/html/{arxiv_id}"
-
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
