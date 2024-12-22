@@ -76,7 +76,8 @@ module = [
     "requests",
     "aiofiles",
     "bs4",
-    "aiohttp"
+    "aiohttp",
+    "icecream"
 ]
 
 [tool.ruff]
