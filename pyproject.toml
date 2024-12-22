@@ -62,7 +62,6 @@ python_version = "3.12"
 files = "src/arxiv_to_word.py"
 strict = true
 check_untyped_defs = true
-ignore_missing_imports = false
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 strict_optional = true

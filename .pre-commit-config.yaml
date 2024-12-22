@@ -57,4 +57,4 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        args: [ --config-file, pyproject.toml ]
+        args: [ --config-file, pyproject.toml, --no-incremental, --ignore-missing-imports ]

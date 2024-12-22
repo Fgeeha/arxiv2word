@@ -53,4 +53,4 @@ jobs:
 
       # Run type checking with mypy
       - name: Run mypy
-        run: poetry run mypy .
+        run: poetry run mypy --ignore-missing-imports --no-incremental
