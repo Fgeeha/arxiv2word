@@ -2,7 +2,7 @@ fail_fast: false
 exclude: ^.*\b(migrations)\b.*$
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -51,3 +51,10 @@ repos:
           - flake8-comprehensions>=3.3.1
           - flake8-eradicate>=1.0.0
           - dlint>=0.11.0
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        name: mypy
+        args: [ --config-file, pyproject.toml ]
