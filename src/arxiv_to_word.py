@@ -10,10 +10,12 @@ import requests
 from aiofiles import open as aio_open
 from bs4 import BeautifulSoup
 from icecream import ic
+from requests.adapters import HTTPAdapter
 from requests.exceptions import (
     RequestException,
     Timeout,
 )
+from urllib3.util.retry import Retry  # type: ignore
 
 
 # Directory for saving output files
@@ -38,6 +40,33 @@ def extract_arxiv_id(url: str) -> Optional[str]:
     return None
 
 
+def get_session_with_retries(retries: int = 3) -> requests.Session:
+    session: requests.Session = requests.Session()
+    retry_strategy: Retry = Retry(
+        total=retries,
+        backoff_factor=1,
+        status_forcelist=[500, 502, 503, 504],
+    )
+    adapter: HTTPAdapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
+
+def is_file_open_or_missing(file_path: str) -> bool:
+    """Check if a file is missing or currently open by another process."""
+    if not os.path.exists(file_path):
+        ic(f"File is missing: {file_path}")
+        return True
+    try:
+        with open(file_path, "rb"):
+            pass  # File is accessible
+        return False
+    except OSError:
+        ic(f"File is currently open or inaccessible: {file_path}")
+        return True
+
+
 async def clean_images_from_folder(folder_path: str = OUTPUT_DIR) -> None:
     try:
         files = os.listdir(folder_path)
@@ -51,6 +80,8 @@ async def clean_images_from_folder(folder_path: str = OUTPUT_DIR) -> None:
         if os.path.isfile(file_path) and any(
             file.lower().endswith(ext) for ext in IMAGE_EXTENSIONS
         ):
+            if is_file_open_or_missing(file_path):
+                continue  # Skip files that are open or missing
             try:
                 os.remove(file_path)
                 ic(f"The file was deleted: {file}")
@@ -87,11 +118,17 @@ async def download_images(
     html_content: str,
     output_dir: str,
     base_url: str = "https://ar5iv.labs.arxiv.org",
+    max_concurrent_downloads: int = 5,
 ) -> None:
     soup: BeautifulSoup = BeautifulSoup(html_content, "html.parser")
     image_urls = [
         urljoin(base_url, img["src"]) for img in soup.find_all("img", src=True)
     ]
+    semaphore = asyncio.Semaphore(max_concurrent_downloads)
+
+    async def limited_download(url: str) -> None:
+        async with semaphore:
+            await download_image(session, url, output_dir)
 
     async with aiohttp.ClientSession() as session:
         tasks = [download_image(session, img_url, output_dir) for img_url in image_urls]
@@ -131,7 +168,8 @@ def convert_html_to_word(html_filename: str) -> None:
 async def download_arxiv_html(arxiv_id: str) -> Optional[str]:
     url = f"https://ar5iv.labs.arxiv.org/html/{arxiv_id}"
     try:
-        response = requests.get(url, timeout=10)
+        session = get_session_with_retries()
+        response = session.get(url, timeout=10)
         response.raise_for_status()
 
         html_filename = os.path.join(OUTPUT_DIR, f"{arxiv_id}.html")
@@ -153,13 +191,14 @@ async def download_arxiv_html(arxiv_id: str) -> Optional[str]:
         ic(f"Error: The timeout for connecting to the {url} has expired.")
     except RequestException as e:
         ic(f"Error when downloading an article from {url}: {e}")
+    except aiohttp.ClientError as e:
+        ic(f"Error when working with a network request: {e} ")
     except Exception as e:
         ic(f"Unknown error: {e}")
 
     return None
 
 
-# Главная функция программы
 async def main() -> None:
     url = input(
         "Enter the link to the article (for example, https://arxiv.org/abs/2403.01915 or 2403.01915): ",
