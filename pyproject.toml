@@ -70,16 +70,6 @@ warn_return_any = true
 warn_unused_ignores = true
 
 
-[[tool.mypy.overrides]]
-module = [
-    "requests.*",
-    "requests",
-    "aiofiles",
-    "bs4",
-    "aiohttp",
-    "icecream"
-]
-
 [tool.ruff]
 target-version = "py312"
 preview = true

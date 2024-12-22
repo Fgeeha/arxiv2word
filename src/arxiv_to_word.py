@@ -5,13 +5,13 @@ import subprocess
 from typing import Optional
 from urllib.parse import urljoin
 
-import aiohttp
-import requests
-from aiofiles import open as aio_open
-from bs4 import BeautifulSoup
-from icecream import ic
-from requests.adapters import HTTPAdapter
-from requests.exceptions import (
+import aiohttp  # type: ignore
+import requests  # type: ignore
+from aiofiles import open as aio_open  # type: ignore
+from bs4 import BeautifulSoup  # type: ignore
+from icecream import ic  # type: ignore
+from requests.adapters import HTTPAdapter  # type: ignore
+from requests.exceptions import (  # type: ignore
     RequestException,
     Timeout,
 )
