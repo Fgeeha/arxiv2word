@@ -35,7 +35,7 @@ def extract_arxiv_id(url: str) -> Optional[str]:
 
     if match := re.search(link_pattern, url):
         return match.group(1)
-    elif match := re.search(id_pattern, url):
+    if match := re.search(id_pattern, url):
         return match.group(1)
     return None
 
@@ -124,11 +124,7 @@ async def download_images(
     image_urls = [
         urljoin(base_url, img["src"]) for img in soup.find_all("img", src=True)
     ]
-    semaphore = asyncio.Semaphore(max_concurrent_downloads)
-
-    async def limited_download(url: str) -> None:
-        async with semaphore:
-            await download_image(session, url, output_dir)
+    asyncio.Semaphore(max_concurrent_downloads)
 
     async with aiohttp.ClientSession() as session:
         tasks = [download_image(session, img_url, output_dir) for img_url in image_urls]
@@ -143,7 +139,11 @@ def fix_image_paths_in_html(html_content: str, output_dir: str) -> str:
     for img in soup.find_all("img", src=True):
         img_path = img["src"]
 
-        # If the path is relative, replace it with the path available inside the container
+        """
+        If the path is relative,
+        replace it with the path available
+        inside the container
+        """
         if img_path.startswith("/html") or img_path.startswith("/assets"):
             img["src"] = os.path.join(output_dir, os.path.basename(img_path))
 
