@@ -5,22 +5,24 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN apt update -y && \
-    apt install -y python3-dev pandoc wget
+# Копирование pyproject.toml
+COPY pyproject.toml /app
 
-ADD pyproject.toml /app
+# Обновление пакетов, установка зависимостей
+RUN apt-get update -y && \
+    apt-get install -y python3-dev pandoc wget && \
+    pip install --upgrade pip && \
+    pip install poetry && \
+    poetry completions bash >> ~/.bash_completion && \
+    poetry lock --no-update && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-root --no-interaction --no-ansi
 
-RUN pip install --upgrade pip
-RUN pip install poetry
-
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-root --no-interaction --no-ansi
-
-# Копируем исходный код в контейнер
+# Копируем исходный код
 COPY src/ /app/src/
 
 # Создаем папку для вывода
 RUN mkdir -p /app/output
 
-# Устанавливаем рабочий каталог и запускаем скрипт
-CMD ["python", "/app/src/arxiv_to_word.py"]
+# Запуск приложения
+CMD ["poetry","run","python", "/app/src/arxiv_to_word.py"]
