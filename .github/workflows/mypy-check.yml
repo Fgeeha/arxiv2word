@@ -9,17 +9,17 @@ jobs:
     steps:
       # Checkout the code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set up Python
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12" # Adjust the Python version as needed
 
       # Cache Poetry dependencies
       - name: Cache Poetry dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4.2.0
         with:
           path: |
             ~/.cache/pypoetry
@@ -41,15 +41,6 @@ jobs:
       # Install dependencies using Poetry
       - name: Install dependencies
         run: poetry install
-
-      # Cache virtual environment
-      - name: Cache virtual environment
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: |
-            venv-${{ runner.os }}-
 
       # Run type checking with mypy
       - name: Run mypy
