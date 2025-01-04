@@ -10,7 +10,9 @@ COPY pyproject.toml /app
 
 # Обновление пакетов, установка зависимостей
 RUN apt-get update -y && \
-    apt-get install -y python3-dev pandoc wget && \
+    apt-get install -y --no-install-recommends python3-dev pandoc wget && \
+    apt-get clean && \
+     rm -rf /var/lib/apt/lists/* &&\
     pip install --upgrade pip && \
     pip install poetry && \
     poetry completions bash >> ~/.bash_completion && \
