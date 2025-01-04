@@ -139,12 +139,12 @@ def fix_image_paths_in_html(html_content: str, output_dir: str) -> str:
     for img in soup.find_all("img", src=True):
         img_path = img["src"]
 
-        """
-        If the path is relative,
-        replace it with the path available
-        inside the container
-        """
         if img_path.startswith("/html") or img_path.startswith("/assets"):
+            '''
+            If the path is relative,
+            replace it with the path available
+            inside the container
+            '''
             img["src"] = os.path.join(output_dir, os.path.basename(img_path))
 
     # We return the corrected HTML as a string
