@@ -52,6 +52,11 @@ repos:
           - flake8-eradicate>=1.0.0
           - dlint>=0.11.0
 
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.4
+    hooks:
+      - id: actionlint
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.14.0
     hooks:
